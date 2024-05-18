@@ -42,7 +42,7 @@ app.post('/checkout', async (req, res) => {
 
         console.log(session);
         res.json({ id: session.id,
-            data:session
+            data:session.url
 
 
         });
