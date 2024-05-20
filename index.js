@@ -167,7 +167,7 @@ app.post('/create-account', async (req, res) => {
   
       // Forward the necessary information to your main application
       try {
-        await axios.post('https://remotide.onrender.com/handle-payment', {
+        await axios.post('https://remotide.onrender.com/api/invoice/handle-payment', {
           sessionId: session.id,
           amount: session.amount_total,
           invoiceId: session.client_reference_id, // Assuming you store invoiceId in the session metadata
