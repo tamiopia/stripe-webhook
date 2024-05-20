@@ -64,7 +64,7 @@ app.post('/create-account', async (req, res) => {
       // Create an account link
       const accountLink = await stripe.accountLinks.create({
         account:account ,
-        refresh_url: 'https://stripe-webhook-gf8o.onrender.com/reauth',
+       
         return_url: 'https://stripe-webhook-gf8o.onrender.com/success',
         type: 'account_onboarding',
       });
@@ -94,8 +94,8 @@ app.post('/create-account', async (req, res) => {
     try {
       const { accountId } = req.body.accountId;
       const payout = await stripe.payouts.create({
-        amount: 1000, // Amount in cents
-        currency: 'usd',
+        amount: 10, // Amount in cents
+        currency: 'EUR',
       }, {
         stripeAccount: accountId, // The connected account ID
       });
@@ -138,5 +138,18 @@ app.post('/create-account', async (req, res) => {
       res.status(500).send({ error: err.message });
     }
   });
+  app.post('/create-charge', async (req, res) => {
+    try {
+      const charge = await stripe.charges.create({
+        amount: 5000000000, // Amount in cents
+        currency: 'usd',
+        source: 'tok_visa', // Use a test token provided by Stripe
+      });
+      res.send(charge);
+    } catch (err) {
+      res.status(500).send({ error: err.message });
+    }
+  });
+  
 
 app.listen(3000,()=>console.log('the server is ready'))
