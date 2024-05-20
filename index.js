@@ -150,6 +150,37 @@ app.post('/create-account', async (req, res) => {
       res.status(500).send({ error: err.message });
     }
   });
+
+  app.post('/webhook', async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+  
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    } catch (err) {
+      console.error('⚠️  Webhook signature verification failed.', err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+  
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+  
+      // Forward the necessary information to your main application
+      try {
+        await axios.post('https://your-main-app.com/handle-payment', {
+          sessionId: session.id,
+          amount: session.amount_total,
+          invoiceId: session.client_reference_id, // Assuming you store invoiceId in the session metadata
+        });
+  
+        console.log('Forwarded checkout.session.completed event to main application.');
+      } catch (error) {
+        console.error('Error forwarding event:', error);
+      }
+    }
+  
+    res.json({ received: true });
+  });
   
 
 app.listen(3000,()=>console.log('the server is ready'))
